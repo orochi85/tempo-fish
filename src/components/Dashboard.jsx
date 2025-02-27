@@ -40,28 +40,34 @@ function Dashboard() {
   }, []);
 
   const cardStyle = {
-    background: alpha('#ffffff', 0.98),
-    backdropFilter: 'blur(20px)',
+    background: alpha(theme.palette.background.paper, 0.8),
+    backdropFilter: 'blur(10px)',
     height: '100%',
     display: 'flex',
     flexDirection: 'column',
-    borderRadius: '12px',
-    border: '1px solid',
-    borderColor: alpha('#000000', 0.1),
+    borderRadius: theme.shape.borderRadius,
+    border: `1px solid ${alpha(theme.palette.divider, 0.1)}`,
     boxShadow: 'none',
     transition: 'all 0.2s ease-in-out',
+    overflow: 'hidden',
     '&:hover': {
-      transform: 'scale(1.005)',
-      boxShadow: '0 4px 20px rgba(0, 0, 0, 0.08)'
+      transform: 'translateY(-2px)',
+      boxShadow: theme.shadows[2]
     }
   };
 
   return (
     <Box sx={{
       minHeight: '100vh',
-      background: '#f5f5f7',
+      background: theme.palette.background.default,
       pt: { xs: 1, sm: 2 },
-      pb: { xs: 2, sm: 4 }
+      pb: { xs: 2, sm: 4 },
+      backgroundImage: `
+        radial-gradient(circle at 100% 0%, ${alpha(theme.palette.primary.light, 0.1)} 0%, transparent 25%),
+        radial-gradient(circle at 0% 100%, ${alpha(theme.palette.primary.main, 0.15)} 0%, transparent 25%)
+      `,
+      backgroundAttachment: 'fixed',
+      backgroundSize: 'cover'
     }}>
       <Container maxWidth="xl" sx={{ 
         px: { xs: 1, sm: 2, md: 4 },
