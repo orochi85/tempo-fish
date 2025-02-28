@@ -1,0 +1,18 @@
+.uv-index {
+  padding: 1rem;
+  border: 1px solid #ccc;
+  border-radius: 8px;
+  background-color: #f9f9f9;
+  text-align: center;
+}
+
+.uv-index h3 {
+  margin-bottom: 0.5rem;
+  font-size: 1.2rem;
+  color: #333;
+}
+
+.uv-index p {
+  font-size: 1rem;
+  color: #666;
+} 
