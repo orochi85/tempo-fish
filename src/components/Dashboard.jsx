@@ -1,4 +1,4 @@
-import { Container, Typography, Paper, Grid, Alert, Box, useTheme, alpha } from '@mui/material';
+import { Container, Typography, Paper, Grid, Box, useTheme, alpha } from '@mui/material';
 import { useLocation } from '../contexts/LocationContext';
 import CitySearch from './CitySearch';
 import WeatherCard from './WeatherCard';
@@ -16,12 +16,16 @@ function Dashboard() {
   const { location, isLoading } = useLocation();
   const theme = useTheme();
 
+  if (isLoading) {
+    return <Typography>Carregando localização...</Typography>;
+  }
+
   const welcomeInfo = useMemo(() => {
     const hour = new Date().getHours();
     if (hour >= 5 && hour < 12) {
       return {
         greeting: 'Bom dia',
-        message: 'O dia está perfeito para pescar!',
+        message: 'O dia está perfeito para pesca!',
         icon: <WbSunny sx={{ color: '#ffd700' }} />
       };
     }
@@ -40,28 +44,30 @@ function Dashboard() {
   }, []);
 
   const cardStyle = {
-    background: alpha('#ffffff', 0.98),
-    backdropFilter: 'blur(20px)',
-    height: '100%',
-    display: 'flex',
-    flexDirection: 'column',
-    borderRadius: '12px',
-    border: '1px solid',
-    borderColor: alpha('#000000', 0.1),
-    boxShadow: 'none',
-    transition: 'all 0.2s ease-in-out',
+    background: alpha(theme.palette.background.paper, 0.9),
+    backdropFilter: 'blur(10px)',
+    borderRadius: '16px',
+    border: `1px solid ${alpha(theme.palette.divider, 0.1)}`,
+    boxShadow: '0 4px 8px rgba(0, 0, 0, 0.1)',
+    transition: 'transform 0.3s ease, box-shadow 0.3s ease',
     '&:hover': {
-      transform: 'scale(1.005)',
-      boxShadow: '0 4px 20px rgba(0, 0, 0, 0.08)'
+      transform: 'translateY(-4px)',
+      boxShadow: '0 8px 16px rgba(0, 0, 0, 0.2)'
     }
   };
 
   return (
     <Box sx={{
       minHeight: '100vh',
-      background: '#f5f5f7',
+      background: theme.palette.background.default,
       pt: { xs: 1, sm: 2 },
-      pb: { xs: 2, sm: 4 }
+      pb: { xs: 2, sm: 4 },
+      backgroundImage: `
+        radial-gradient(circle at 100% 0%, ${alpha(theme.palette.primary.light, 0.1)} 0%, transparent 25%),
+        radial-gradient(circle at 0% 100%, ${alpha(theme.palette.primary.main, 0.15)} 0%, transparent 25%)
+      `,
+      backgroundAttachment: 'fixed',
+      backgroundSize: 'cover'
     }}>
       <Container maxWidth="xl" sx={{ 
         px: { xs: 1, sm: 2, md: 4 },
@@ -86,12 +92,7 @@ function Dashboard() {
                 <Paper 
                   elevation={0}
                   sx={{ 
-                    background: alpha(theme.palette.background.paper, 0.9),
-                    backdropFilter: 'blur(10px)',
-                    borderRadius: { xs: '12px', sm: '16px' },
-                    border: '1px solid',
-                    borderColor: alpha('#000000', 0.1),
-                    overflow: 'hidden',
+                    ...cardStyle,
                     mb: { xs: 1, sm: 2 }
                   }}
                 >
@@ -138,36 +139,19 @@ function Dashboard() {
                     }}>
                       <LocationOn />
                       <Typography>
-                        {isLoading ? 'Obtendo sua localização...' : `Você está em ${location.cityName}`}
+                        {location.cityName}
                       </Typography>
                     </Box>
                   </Box>
                 </Paper>
               </Grid>
-
+              
               <Grid item xs={12}>
                 <Paper sx={{ 
-                  ...cardStyle, 
-                  p: { xs: 1.5, sm: 2 },
+                  ...cardStyle,
                   borderRadius: { xs: '12px', sm: '16px' }
                 }}>
                   <CitySearch />
-                </Paper>
-              </Grid>
-              <Grid item xs={12}>
-                <Paper sx={{ 
-                  ...cardStyle,
-                  borderRadius: { xs: '12px', sm: '16px' }
-                }}>
-                  <SolunarCard />
-                </Paper>
-              </Grid>
-              <Grid item xs={12}>
-                <Paper sx={{ 
-                  ...cardStyle,
-                  borderRadius: { xs: '12px', sm: '16px' }
-                }}>
-                  <TidesCard />
                 </Paper>
               </Grid>
             </Grid>
@@ -175,18 +159,7 @@ function Dashboard() {
 
           <Grid item xs={12} md={9}>
             <Grid container spacing={{ xs: 1, sm: 2 }}>
-              <Grid item xs={12}>
-                <Paper sx={{ 
-                  ...cardStyle, 
-                  p: { xs: 1, sm: 2 }, 
-                  minHeight: { xs: '300px', sm: '400px', md: '500px' },
-                  borderRadius: { xs: '12px', sm: '16px' }
-                }}>
-                  <FishingMap />
-                </Paper>
-              </Grid>
-              
-              <Grid item xs={12} sm={6}>
+              <Grid item xs={12} md={8}>
                 <Paper sx={{ 
                   ...cardStyle,
                   borderRadius: { xs: '12px', sm: '16px' }
@@ -194,7 +167,8 @@ function Dashboard() {
                   <WeatherCard />
                 </Paper>
               </Grid>
-              <Grid item xs={12} sm={6}>
+
+              <Grid item xs={12} md={4}>
                 <Paper sx={{ 
                   ...cardStyle,
                   borderRadius: { xs: '12px', sm: '16px' }
@@ -202,20 +176,49 @@ function Dashboard() {
                   <UVIndex />
                 </Paper>
               </Grid>
-              <Grid item xs={12} sm={6}>
+
+              <Grid item xs={12} md={8}>
                 <Paper sx={{ 
                   ...cardStyle,
                   borderRadius: { xs: '12px', sm: '16px' }
                 }}>
-                  <WeatherAlerts />
+                  <FishingMap />
                 </Paper>
               </Grid>
-              <Grid item xs={12} sm={6}>
+
+              <Grid item xs={12} md={4}>
+                <Paper sx={{ 
+                  ...cardStyle,
+                  borderRadius: { xs: '12px', sm: '16px' }
+                }}>
+                  <SolunarCard />
+                </Paper>
+              </Grid>
+
+              <Grid item xs={12} md={6}>
+                <Paper sx={{ 
+                  ...cardStyle,
+                  borderRadius: { xs: '12px', sm: '16px' }
+                }}>
+                  <TidesCard />
+                </Paper>
+              </Grid>
+
+              <Grid item xs={12} md={6}>
                 <Paper sx={{ 
                   ...cardStyle,
                   borderRadius: { xs: '12px', sm: '16px' }
                 }}>
                   <WindChart />
+                </Paper>
+              </Grid>
+
+              <Grid item xs={12}>
+                <Paper sx={{ 
+                  ...cardStyle,
+                  borderRadius: { xs: '12px', sm: '16px' }
+                }}>
+                  <WeatherAlerts />
                 </Paper>
               </Grid>
             </Grid>
