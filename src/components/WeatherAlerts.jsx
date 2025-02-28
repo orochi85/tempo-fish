@@ -1,95 +1,88 @@
-import { Box, Typography, CircularProgress, Alert, Stack } from '@mui/material';
-import { Warning, Info } from '@mui/icons-material';
+import React from 'react';
+import { Card, CardContent, Typography, Box, CircularProgress } from '@mui/material';
+import { Warning } from '@mui/icons-material';
 import { useQuery } from '@tanstack/react-query';
 import { useLocation } from '../contexts/LocationContext';
 
-function WeatherAlerts() {
+export default function WeatherAlerts() {
   const { location } = useLocation();
 
   const { data, isLoading } = useQuery({
-    queryKey: ['alerts', location.cityName],
+    queryKey: ['weatherAlerts', location.lat, location.lon],
     queryFn: async () => {
-      const response = await fetch('https://apiprevmet3.inmet.gov.br/avisos/rss');
-      const data = await response.text();
-      const parser = new DOMParser();
-      const xml = parser.parseFromString(data, 'text/xml');
-      const items = xml.querySelectorAll('item');
-      
-      return Array.from(items).map(item => ({
-        title: item.querySelector('title')?.textContent || '',
-        description: item.querySelector('description')?.textContent || '',
-        area: item.querySelector('AreaAviso')?.textContent || '',
-        severity: item.querySelector('Severidade')?.textContent || '',
-        date: new Date(item.querySelector('pubDate')?.textContent || ''),
-      })).filter(alert => 
-        alert.area.toLowerCase().includes(location.cityName.toLowerCase())
-      ).slice(0, 3); // Limita a 3 alertas mais recentes
+      const response = await fetch(
+        `https://api.openweathermap.org/data/2.5/onecall?lat=${location.lat}&lon=${location.lon}&exclude=current,minutely,hourly,daily&appid=600a0f362f4d58a845afab7f24a58544`
+      );
+      const data = await response.json();
+      return data.alerts || [];
     }
   });
 
-  const getSeverityColor = (severity) => {
-    switch (severity.toLowerCase()) {
-      case 'perigo':
-        return '#d32f2f';
-      case 'perigo potencial':
-        return '#ed6c02';
-      default:
-        return '#2e7d32';
-    }
-  };
-
   if (isLoading) {
     return (
-      <Box sx={{ display: 'flex', justifyContent: 'center', p: 2 }}>
-        <CircularProgress />
-      </Box>
+      <Card sx={{ 
+        borderRadius: '16px', 
+        background: 'linear-gradient(135deg, #f0f0f0 0%, #e0e0e0 100%)',
+        boxShadow: '0 4px 8px rgba(0, 0, 0, 0.1)',
+        transform: 'rotate(-2deg)',
+        width: '100%',
+        height: '100%',
+        display: 'flex',
+        flexDirection: 'column',
+        justifyContent: 'center',
+        alignItems: 'center',
+        textAlign: 'center',
+        padding: '16px',
+      }}>
+        <CardContent>
+          <CircularProgress />
+        </CardContent>
+      </Card>
     );
   }
 
   return (
-    <Box sx={{ p: 2 }}>
-      <Box sx={{ 
-        display: 'flex', 
-        alignItems: 'center', 
-        gap: 1, 
-        mb: 2 
-      }}>
-        <Warning />
-        <Typography variant="h6">
-          Alertas Meteorológicos
-        </Typography>
-      </Box>
-
-      {data && data.length > 0 ? (
-        <Stack spacing={2}>
-          {data.map((alert, index) => (
-            <Alert 
-              key={index}
-              severity={alert.severity.toLowerCase() === 'perigo' ? 'error' : 'warning'}
-              icon={<Info />}
-              sx={{ 
-                '& .MuiAlert-icon': {
-                  color: getSeverityColor(alert.severity)
-                },
-                borderLeft: `4px solid ${getSeverityColor(alert.severity)}`
-              }}
-            >
-              <Typography variant="subtitle2" sx={{ fontWeight: 'bold', mb: 0.5 }}>
-                {alert.title}
+    <Card sx={{ 
+      borderRadius: '16px',
+      background: 'linear-gradient(135deg, #ff6b6b 0%, #ff6b6b80 100%)',
+      boxShadow: '0 4px 8px rgba(0, 0, 0, 0.1)',
+      transform: 'rotate(-2deg)',
+      width: '100%',
+      height: '100%',
+      display: 'flex',
+      flexDirection: 'column',
+      justifyContent: 'center',
+      alignItems: 'center',
+      textAlign: 'center',
+      padding: '16px',
+    }}>
+      <CardContent>
+        <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, mb: 2 }}>
+          <Warning sx={{ fontSize: '2rem', color: '#ffffff' }} />
+          <Typography variant="h5" sx={{ fontWeight: 'bold', color: '#ffffff' }}>
+            Alertas Meteorológicos
+          </Typography>
+        </Box>
+        {data.length > 0 ? (
+          data.map((alert, index) => (
+            <Box key={index} sx={{ mb: 2 }}>
+              <Typography variant="h6" sx={{ fontWeight: 'bold', color: '#ffffff' }}>
+                {alert.event}
               </Typography>
-              <Typography variant="body2">
-                {alert.description.split('.')[0]}.
+              <Typography variant="body1" sx={{ color: '#ffffff' }}>
+                {alert.description}
               </Typography>
-            </Alert>
-          ))}
-        </Stack>
-      ) : (
-        <Alert severity="success">
-          Não há alertas ativos para sua região.
-        </Alert>
-      )}
-    </Box>
+              <Typography variant="body2" sx={{ color: '#ffffff', mt: 1 }}>
+                De: {new Date(alert.start * 1000).toLocaleString()} até {new Date(alert.end * 1000).toLocaleString()}
+              </Typography>
+            </Box>
+          ))
+        ) : (
+          <Typography variant="body1" sx={{ color: '#ffffff' }}>
+            Nenhum alerta meteorológico ativo.
+          </Typography>
+        )}
+      </CardContent>
+    </Card>
   );
-}
-
-export default WeatherAlerts; 
+} 

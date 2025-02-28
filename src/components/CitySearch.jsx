@@ -59,49 +59,71 @@ function CitySearch() {
   };
 
   return (
-    <Autocomplete
-      options={cities}
-      loading={loading}
-      getOptionLabel={(option) => option.displayName || ''}
-      inputValue={inputValue}
-      onInputChange={(_, newValue) => setInputValue(newValue)}
-      onChange={(_, newValue) => {
-        if (newValue) {
-          setLocation({
-            cityName: newValue.displayName,
-            lat: newValue.lat,
-            lon: newValue.lon
-          });
-        }
-      }}
-      renderInput={(params) => (
-        <TextField
-          {...params}
-          label="Buscar cidade"
-          placeholder="Digite o nome da cidade"
-          InputProps={{
-            ...params.InputProps,
-            startAdornment: <LocationOn color="action" />,
-            endAdornment: (
-              <>
-                {loading ? <CircularProgress color="inherit" size={20} /> : null}
-                {params.InputProps.endAdornment}
-              </>
-            )
-          }}
-        />
-      )}
-      renderOption={(props, option) => (
-        <Box component="li" {...props}>
-          <Box sx={{ display: 'flex', alignItems: 'center' }}>
-            <LocationOn sx={{ color: 'text.secondary', mr: 1 }} />
-            {option.displayName}
+    <Box sx={{ width: '100%', p: 1 }}>
+      <Autocomplete
+        options={cities}
+        loading={loading}
+        getOptionLabel={(option) => option.displayName || ''}
+        inputValue={inputValue}
+        onInputChange={(_, newValue) => setInputValue(newValue)}
+        onChange={(_, newValue) => {
+          if (newValue) {
+            setLocation({
+              cityName: newValue.displayName,
+              lat: newValue.lat,
+              lon: newValue.lon
+            });
+          }
+        }}
+        renderInput={(params) => (
+          <TextField
+            {...params}
+            label="Buscar cidade"
+            placeholder="Digite o nome da cidade"
+            InputProps={{
+              ...params.InputProps,
+              startAdornment: <LocationOn color="action" />,
+              endAdornment: (
+                <>
+                  {loading ? <CircularProgress color="inherit" size={20} /> : null}
+                  {params.InputProps.endAdornment}
+                </>
+              )
+            }}
+            fullWidth
+            sx={{
+              '& .MuiOutlinedInput-root': {
+                borderRadius: '12px',
+              },
+              '& .MuiInputLabel-root': {
+                transform: 'translate(14px, 14px) scale(1)',
+                '&.MuiInputLabel-shrink': {
+                  transform: 'translate(14px, -6px) scale(0.75)',
+                },
+              },
+              '& .MuiAutocomplete-inputRoot': {
+                paddingRight: '14px !important',
+              },
+            }}
+          />
+        )}
+        renderOption={(props, option) => (
+          <Box component="li" {...props}>
+            <Box sx={{ display: 'flex', alignItems: 'center' }}>
+              <LocationOn sx={{ color: 'text.secondary', mr: 1 }} />
+              {option.displayName}
+            </Box>
           </Box>
-        </Box>
-      )}
-      noOptionsText="Nenhuma cidade encontrada"
-      loadingText="Carregando cidades..."
-    />
+        )}
+        noOptionsText="Nenhuma cidade encontrada"
+        loadingText="Carregando cidades..."
+        sx={{
+          '& .MuiAutocomplete-popper': {
+            borderRadius: '12px',
+          },
+        }}
+      />
+    </Box>
   );
 }
 
